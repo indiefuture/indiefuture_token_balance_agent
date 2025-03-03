@@ -1,0 +1,24 @@
+
+
+[
+    {
+      "name": "ListTools",
+      "description": "Provide information related to the available tools of this agent",
+        "parameters": {
+           "type": "object",
+            "properties": {
+                  
+            },
+            "required": [ ] 
+
+        } 
+      
+    }  
+
+
+    
+    
+    
+  ]
+
+  

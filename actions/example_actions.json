@@ -1,0 +1,114 @@
+
+
+
+
+https://platform.openai.com/docs/guides/function-calling
+
+
+https://community.openai.com/t/gpt-actions-compendium-list-of-free-and-open-source-gpt-actions/611847
+https://github.com/openai/openai-openapi
+
+{
+  "type": "object",
+  "properties": {
+    "task_id": {
+      "type": "integer",
+      "description": "The unique identifier for the task"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "in_progress", "completed", "archived"],
+      "description": "The current status of the task"
+    }
+  },
+  "required": ["task_id", "status"]
+}
+
+
+
+
+    {
+      "servers": [
+        {
+          "url": "https://{username}.gigantic-server.com:{port}/{basePath}",
+          "description": "The production API server",
+          "variables": {
+            "username": {
+              "default": "demo",
+              "description": "A user-specific subdomain. Use `demo` for a free sandbox environment."
+            },
+            "port": {
+              "enum": ["8443", "443"],
+              "default": "8443"
+            },
+            "basePath": {
+              "default": "v2"
+            }
+          }
+        }
+      ]
+    }
+
+
+        {
+      "components": {
+        "schemas": {
+          "Pet": {
+            "type": "object",
+            "discriminator": {
+              "propertyName": "petType"
+            },
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "petType": {
+                "type": "string"
+              }
+            },
+            "required": ["name", "petType"]
+          },
+          "Cat": {
+            "description": "A representation of a cat. Note that `Cat` will be used as the discriminating value.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Pet"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "huntingSkill": {
+                    "type": "string",
+                    "description": "The measured skill for hunting",
+                    "default": "lazy",
+                    "enum": ["clueless", "lazy", "adventurous", "aggressive"]
+                  }
+                },
+                "required": ["huntingSkill"]
+              }
+            ]
+          },
+          "Dog": {
+            "description": "A representation of a dog. Note that `Dog` will be used as the discriminating value.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Pet"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "packSize": {
+                    "type": "integer",
+                    "format": "int32",
+                    "description": "the size of the pack the dog is from",
+                    "default": 0,
+                    "minimum": 0
+                  }
+                },
+                "required": ["packSize"]
+              }
+            ]
+          }
+        }
+      }
+    }
