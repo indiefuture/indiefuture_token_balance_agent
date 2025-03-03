@@ -47,13 +47,13 @@ use super::web_controller::WebController;
  
 curl -X POST http://localhost:8080/api/webhook \
      -H "Content-Type: application/json" \
-     -d '{ "session_token": "f97169e34730ca74ced6d59ee684d91e", "wallet_public_address":"0x810E096DDa9ae3Ae2b55a9c45068F9FE8eeea6db"  }'
+     -d '{ "session_token": " ", "wallet_public_address":" "  }'
 
 
 
 curl -X POST http://localhost:8080/api/webhook \
      -H "Content-Type: application/json" \
-     -d '{ "session_token": "f97169e34730ca74ced6d59ee684d91e", "wallet_public_address":"0x810E096DDa9ae3Ae2b55a9c45068F9FE8eeea6db"  }'
+     -d '{ "session_token": " ", "wallet_public_address":" "  }'
 
 
 

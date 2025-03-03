@@ -36,7 +36,7 @@ async fn main()  -> io::Result<()> {
    // std::env::set_var("RUST_LOG", "actix_web=info,actix_server=info"); // Adjust as per your needs
     env_logger::init();
 
-    println!("connecting to db.");
+ //   println!("connecting to db.");
 
   
   //  let db_conn_url = std::env::var("DB_CONN_URL").expect(" DB_CONN_URL must be set in env ");
@@ -47,7 +47,10 @@ async fn main()  -> io::Result<()> {
 
      let ai_engine_data = Arc::new( AiEngineData::new( system_prompt )  );
 
-    println!("connected to db.");
+   // println!("connected to db.");
+
+
+    println!("starting webserver");
 
     //setup and launch the http server
     HttpServer::new(move || {

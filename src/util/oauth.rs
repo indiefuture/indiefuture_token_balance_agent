@@ -27,10 +27,7 @@ WHen i go to install my app into shopify,
 
 shopify redirect the user to here
 
-http://localhost:8000/api/oauth/shopify/callback?hmac=6d349db4b25793507b8d0284cf4b47843454bd9a01c90aa22ea7f4d3eec950ed&host=YWRtaW4uc2hvcGlmeS5jb20vc3RvcmUvcXVpY2tzdGFydC01NDBmMmU4OA&shop=quickstart-540f2e88.myshopify.com&timestamp=1698197853
-
-
-
+ 
 
 
 
