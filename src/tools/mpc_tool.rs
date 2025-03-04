@@ -64,7 +64,7 @@ impl MpcTool for ListTools {
 
 
 
- async fn handle_mpc_tool( &self, input_body: String,  input_props: serde_json::Value,  ai_engine_data: Arc< AiEngineData >, )
+ async fn handle_mpc_tool( &self, _input_body: String,  _input_props: serde_json::Value,  ai_engine_data: Arc< AiEngineData >, )
 	 	 ->  MpcToolOutput { 
 
 
@@ -102,6 +102,86 @@ impl MpcTool for ListTools {
 
 
 
+#[derive(Serialize,Deserialize)]
+pub struct GetTokenBalanceInputs {
+	pub token_address_or_symbol: String,
+	pub chain_id: Option<i32>,
+	pub wallet_address: String 
+}
+
+
+pub struct GetTokenBalance ;  // loan id
+ 
+
+ #[async_trait]
+impl MpcTool for GetTokenBalance {
+
+
+
+ async fn handle_mpc_tool( &self, _input_body: String,  input_props: serde_json::Value,  _ai_engine_data: Arc< AiEngineData >, )
+	 	 ->  MpcToolOutput { 
+
+
+
+	 	 	let Ok(input_props) =  serde_json::from_value::<GetTokenBalanceInputs>( input_props )else {
+ 
+	 	 		return MpcToolOutput { 
+
+	 	 			message: Some( "Could not parse input props".to_string() ),
+
+	 	 			..Default::default()
+	 	 		 };
+	 	 	};
+ 
+	 	  		
+
+
+	 	 		let Ok(token_balance_data) =  crate::tools::evm_tools::get_token_balance_data(  input_props   ).await  else {
+
+
+
+			 	 		return MpcToolOutput { 
+
+			 	 			message: Some( "Could not fetch token balance data".to_string() ),
+
+			 	 			..Default::default()
+			 	 		 };
+
+	 	 		};
+
+
+	 	 		
+	 	 			let msg =  format!( " 
+
+	 	 		     Here is the token balance information.  
+ 
+	 	 			 "  ); 
+
+ 
+ 
+
+	 	 		MpcToolOutput {
+
+	 	 		 message: Some(msg.to_string()) , 
+	 	 		 structured_data:  token_balance_data ,
+
+
+	 	 		 ..Default::default()
+
+
+	 	 		  }
+	 	 }	
+
+}
+
+
+
+
+ 
+
+
+
+
  
 
 
@@ -116,8 +196,7 @@ impl MpcTool for ListTools {
 
 pub enum MpcToolType {
 	ListTools,
- 
-
+	GetTokenBalance
 }
 
 
@@ -130,6 +209,8 @@ impl MpcToolType {
 
 			//goes to deeper pages 
 			"ListTools" => Some(Self::ListTools),
+
+			"GetTokenBalance" => Some(Self::GetTokenBalance),
 			 
 			_ => None 
  
@@ -147,6 +228,8 @@ impl MpcToolType {
     pub fn get_tool(&self) -> Arc<dyn MpcTool> {
         match self {
             Self::ListTools  =>  Arc::new(ListTools),
+
+             Self::GetTokenBalance  =>  Arc::new(GetTokenBalance),
             
          
             // Other cases should return their respective tool implementations

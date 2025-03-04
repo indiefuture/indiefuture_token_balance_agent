@@ -7,13 +7,51 @@
         "parameters": {
            "type": "object",
             "properties": {
-                  
+
             },
             "required": [ ] 
 
         } 
       
+    },
+
+
+
+     {
+      "name": "GetTokenBalance",
+      "description": "Provide information related to the ERC20 Token Balance",
+        "parameters": {
+           "type": "object",
+            "properties": {
+                     
+
+              "token_address_or_symbol": {
+                "type": "string",
+                "description": "The token address or symbol for the token"
+              },
+
+
+              "chain_id": {
+                "type": "integer",
+                "description": "The chaid id for the network, defaults to 1 for mainnet"
+              },
+
+
+              "wallet_address": {
+                "type": "string",
+                "description": "The ethereum public address for the wallet"
+              } 
+                  
+
+
+
+            },
+            "required": [ "token_address_or_symbol", "wallet_address" ] 
+
+        } 
+      
     }  
+
 
 
     

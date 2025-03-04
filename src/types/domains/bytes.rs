@@ -22,7 +22,7 @@ impl<'a> FromSql<'a> for DomainBytes {
 impl ToSql for DomainBytes {
     fn to_sql(
         &self,
-        ty: &Type,
+        _ty: &Type,
         out: &mut BytesMut,
     ) -> Result<IsNull, Box<dyn Error + Sync + Send>> {
         out.extend_from_slice(&self.0);
