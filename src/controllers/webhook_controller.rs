@@ -20,7 +20,9 @@ use indiefuture_template_agent::types::indiefuture_types::IndiefutureAgentMessag
 use indiefuture_template_agent::ai::ai_engine::generate_ai_output_pass;
 
 
+use indiefuture_template_agent::types::selected_record::SelectedRecord;
 use indiefuture_template_agent::util::header_map_preset::HeaderMapPreset;
+use indiefuture_template_agent::util::http_request::perform_req;
 use indiefuture_template_agent::util::http_request::perform_req_typed;
 use indiefuture_template_agent::util::http_request::EndpointType;
 use indiefuture_template_agent::util::http_request::IntoHttpRequest;
@@ -232,7 +234,7 @@ async fn handle_webhook(
 
         };
 
-        let client_public_address =  &get_workspace_client_key_data.client_address; 
+        let client_public_address =  &get_workspace_client_key_data.entry.client_address; 
 
 
 
@@ -253,16 +255,32 @@ async fn handle_webhook(
         let credits_deducted_result = deduct_credits_for_client  (
              workspace_uuid.to_string(),
             workspace_api_key, 
-             client_public_address.0.to_string() ,
+             client_public_address.to_string_full() ,
             credit_deduction_amount_cents
          ).await   ;
 
+        println!( "credits_deducted_result {:?}", credits_deducted_result );
 
           // ------------- 
 
+             if credits_deducted_result.is_none()  {
+
+              return   HttpResponse::InternalServerError().json( json!( {
+
+                   "error":  "Unable to deduct credits ",
+
+               } ) ); 
+
+        };
 
 
 
+
+
+
+        //  -------------------------------- 
+
+        // this is where you would do the special API stuff now that the agent has been paid in credits !! 
 
 
  
@@ -432,7 +450,7 @@ pub struct RefillClientKeyData {
         client_key: String ,
         
 
-    ) ->    Option<  RefillClientKeyData  >    {
+    ) ->    Option< SelectedRecord< RefillClientKeyData >  >    {
 
 
 
@@ -442,21 +460,35 @@ pub struct RefillClientKeyData {
        
       };
 
-     let response: Option< AuthResponse< RefillClientKeyData > >  
-        = perform_req_typed( &endpoint ).await.ok().flatten()  ;
+        let response_one   = perform_req ( &endpoint ).await  ;
+
+         println!("response_one {:?}", response_one.unwrap().text().await );
+
+
+     let response: Result< Option< AuthResponse< SelectedRecord< RefillClientKeyData >  > >  , reqwest::Error > 
+        = perform_req_typed( &endpoint ).await  ;
 
 
 
      match response {
 
-         Some( res  ) => {   
+         Ok( Some( res  ) )  => {   
 
- 
+             println!("res {:?}", res );
                 return res.data 
 
 
 
         },
+
+        Err( e ) => {
+
+
+            println!("error {:?}", e );
+
+
+            None 
+        }
 
         _ => None 
 
@@ -493,10 +525,10 @@ pub struct RefillClientKeyData {
 
 #[derive(Serialize)]
  pub struct DeductCreditsEndpoint {
-    apikey: String , 
+    session_token: String , //apikey  
     workspace_uuid: String, 
-    client_public_address: String ,
-    credits_delta: i64 
+    client_address: String ,
+    credits_delta_cents: i64 
 
  } 
 
@@ -532,21 +564,21 @@ pub struct UpdateApiCreditsOutput {
 
 
  async fn deduct_credits_for_client (
-        apikey: String , 
+        
         workspace_uuid: String, 
-        client_public_address: String ,
-        credits_delta: i64 
-
+        session_token: String , 
+        client_address: String ,
+        credits_delta_cents: i64  
     ) ->  Option< AuthResponse< UpdateApiCreditsOutput> >   {
 
 
 
 
     let endpoint = DeductCreditsEndpoint { 
-         apikey  , 
+         session_token  , 
         workspace_uuid , 
-        client_public_address  ,
-        credits_delta 
+        client_address  ,
+        credits_delta_cents
       };
 
      let response: Option< AuthResponse< UpdateApiCreditsOutput> >  

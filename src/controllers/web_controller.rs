@@ -15,7 +15,7 @@ pub trait WebController {
 
 
 
-#[derive(   Debug)]
+#[derive(   Debug   )]
 pub struct WebControllerSuccessResponse  ;
 impl Serialize for WebControllerSuccessResponse {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
@@ -69,7 +69,7 @@ pub struct AuthSessionOutput {
  
 
 
- #[derive(Deserialize, Serialize)]
+ #[derive(Deserialize, Serialize, Debug ,Clone )]
 pub struct AuthResponse <T>  {
    pub success: bool,
    pub data: Option< T >,
