@@ -9,6 +9,7 @@ use dotenvy::dotenv;
  use actix_cors::Cors;
 use actix_web::web::Data;
 use actix_web::{App, HttpServer};
+use actix_files::Files;
 
  
 mod controllers;
@@ -79,12 +80,14 @@ async fn main()  -> io::Result<()> {
             .wrap(cors)
             .wrap(actix_web::middleware::Logger::default()) // Enable logger middleware
             
+            // Serve static files from the /public directory
+            .service(Files::new("/", "./public").index_file("index.html"))
 
               .configure(WebhookController::config)
              
              
     })
-    .bind("0.0.0.0:8080")?
+    .bind("0.0.0.0:9000")?
     .run()
     .await  
 

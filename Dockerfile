@@ -6,6 +6,7 @@ COPY Cargo.lock /app/
  
 COPY actions /app/actions/
 COPY src /app/src/ 
+COPY public /app/public/ 
 RUN apt update && apt install -y pkg-config libssl-dev ca-certificates
 RUN cargo build --release
 

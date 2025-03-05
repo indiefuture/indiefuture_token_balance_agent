@@ -259,9 +259,9 @@ pub async fn handle_tool_call(
 
     let tool = tool_type.get_tool();
 
-    let input_props  = serde_json::from_str(&ai_body_tool_call.function.arguments) .ok() .unwrap_or( json!("{}") ) ;
+    let input_props  =  &ai_body_tool_call.function.arguments ;
   
 
-    tool.handle_mpc_tool(input_body, input_props,  Arc::clone( &ai_engine_data ) ).await
+    tool.handle_mpc_tool(input_body, input_props.clone(),  Arc::clone( &ai_engine_data ) ).await
 }
  

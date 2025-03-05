@@ -1,0 +1,37 @@
+{
+	"name":"IndiefutureAgentManifest",
+	"version":"0.01" ,
+	"workspace_name":"Defi Relay",
+	"workspace_uuid":"0xc8194c8840b8aa64",
+	
+	"functions:":[
+		
+
+		{
+	      "name": "RegisterToWorkspace",
+	      "description": "Register to this workspace, generating a client apikey",
+	        "parameters": {
+	           "type": "object",
+	            "properties": {
+
+
+
+	            	  	
+		              "workspace_uuid": {
+		                "type": "string",
+		                "description": "The uuid for the workspace for which to register "
+		              },
+
+
+	            },
+	            "required": [ "workspace_uuid" ] 
+
+	        } 
+	      
+	    } 
+
+
+	]
+
+
+}

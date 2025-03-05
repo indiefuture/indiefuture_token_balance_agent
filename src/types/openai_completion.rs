@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct GptFunctionCall {
     pub name: String,
-    pub arguments: String, // serde_json::Value  //this a stringified array i think         // Vec< Box<serde_json::Value> >
+    pub arguments:  serde_json::Value , // serde_json::Value  //this a stringified array i think         // Vec< Box<serde_json::Value> >
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
