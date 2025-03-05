@@ -13,6 +13,7 @@ use actix_web::Responder;
 use indiefuture_template_agent::app_state::AppState;
   
  use indiefuture_template_agent::types::domains::decimal::DomainDecimal;
+use indiefuture_template_agent::types::domains::eth_address::DomainEthAddress;
 use indiefuture_template_agent::types::indiefuture_types::IndiefutureAgentMessagePrimitives;
  
 
@@ -188,8 +189,10 @@ async fn handle_webhook(
                     structured_data: Some( 
                         json!(
 
-                            { "error":  "InsufficientCreditsForWorkspace",
-                             "workspace_uuid" : workspace_uuid .clone() , }
+                            {
+                                "error":  "InsufficientCreditsForWorkspace",
+                                 "workspace_uuid" : workspace_uuid .clone() 
+                              }
                             
                           )
                      ), 
@@ -210,13 +213,52 @@ async fn handle_webhook(
         //--------------
 
 
-            // DEDUCT CREDITS HERE !!! 
+           // DEDUCT CREDITS HERE !!! 
         // ------------
 
 
 
+     let Some( get_workspace_client_key_data ) = get_refill_client_data (
+       
+         client_api_key.clone() 
 
-            // ------------- 
+      ).await else  {
+
+              return   HttpResponse::InternalServerError().json( json!( {
+
+                   "error":  "Could not get client data",
+
+               } ) ); 
+
+        };
+
+        let client_public_address =  &get_workspace_client_key_data.client_address; 
+
+
+
+
+        let Some( workspace_api_key)  =  std::env::var("DEFIRELAY_WORKSPACE_API_KEY").ok() else  {
+
+              return   HttpResponse::InternalServerError().json( json!( {
+
+                   "error":  "Misconfiguration",
+
+               } ) ); 
+
+        };
+
+
+        let credit_deduction_amount_cents = 2; 
+
+        let credits_deducted_result = deduct_credits_for_client  (
+             workspace_uuid.to_string(),
+            workspace_api_key, 
+             client_public_address.0.to_string() ,
+            credit_deduction_amount_cents
+         ).await   ;
+
+
+          // ------------- 
 
 
 
@@ -241,17 +283,17 @@ async fn handle_webhook(
 }
 
  
-
-#[derive(Deserialize,Serialize)]
-struct WebhookOutput {
-
-   // id: i32 ,
-   success: bool 
-
-}
+ 
  
 
  
+
+
+// ----------------------
+
+
+
+
 
 
 #[derive(Serialize, Deserialize, Debug )]
@@ -322,6 +364,196 @@ pub struct GetApiCreditsOutput {
         _ => None 
 
     }
+
+
+
+
+ }
+
+
+
+// ----------------------
+
+
+
+
+
+
+
+
+
+
+
+
+#[derive(Serialize)]
+ pub struct GetClientKeyDataEndpoint {
+   
+    client_key : String ,
+   
+ } 
+
+
+ impl IntoHttpRequest for GetClientKeyDataEndpoint {
+    fn get_url(&self) -> String {
+        "https://api.defirelay.com/api/client_key/find_by_client_key" .into() 
+    }
+
+    fn get_data(&self) -> serde_json::Value {
+        
+        serde_json::to_value( self  ) .unwrap_or_default()
+    }
+
+    fn get_headers(&self) -> Option<reqwest::header::HeaderMap> {
+        HeaderMapPreset::ApplicationJson.build() .into() 
+    }
+
+    fn get_endpoint_type(&self) ->  EndpointType {
+         EndpointType::POST
+    }
+}
+
+
+
+
+#[derive(Serialize, Deserialize, Debug )]
+pub struct RefillClientKeyData {
+   
+    pub name: Option<String>,
+    pub client_key: String,
+    pub client_address: DomainEthAddress,
+    pub workspace_uuid: String ,
+    pub credits: DomainDecimal,
+}
+
+
+
+ async fn get_refill_client_data (
+        
+        client_key: String ,
+        
+
+    ) ->    Option<  RefillClientKeyData  >    {
+
+
+
+
+    let endpoint = GetClientKeyDataEndpoint { 
+         client_key  , 
+       
+      };
+
+     let response: Option< AuthResponse< RefillClientKeyData > >  
+        = perform_req_typed( &endpoint ).await.ok().flatten()  ;
+
+
+
+     match response {
+
+         Some( res  ) => {   
+
+ 
+                return res.data 
+
+
+
+        },
+
+        _ => None 
+
+    }
+
+
+ 
+
+
+
+
+ }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ----------------------
+
+#[derive(Serialize)]
+ pub struct DeductCreditsEndpoint {
+    apikey: String , 
+    workspace_uuid: String, 
+    client_public_address: String ,
+    credits_delta: i64 
+
+ } 
+
+
+ impl IntoHttpRequest for DeductCreditsEndpoint {
+    fn get_url(&self) -> String {
+        "https://api.defirelay.com/api/client_key/deduct_api_credits" .into() 
+    }
+
+    fn get_data(&self) -> serde_json::Value {
+        
+        serde_json::to_value( self  ) .unwrap_or_default()
+    }
+
+    fn get_headers(&self) -> Option<reqwest::header::HeaderMap> {
+        HeaderMapPreset::ApplicationJson.build() .into() 
+    }
+
+    fn get_endpoint_type(&self) ->  EndpointType {
+         EndpointType::POST
+    }
+}
+
+
+
+
+#[derive(Serialize, Deserialize, Debug )]
+pub struct UpdateApiCreditsOutput {
+    new_credits: DomainDecimal,
+    new_credits_cents: i64,
+}
+
+
+
+ async fn deduct_credits_for_client (
+        apikey: String , 
+        workspace_uuid: String, 
+        client_public_address: String ,
+        credits_delta: i64 
+
+    ) ->  Option< AuthResponse< UpdateApiCreditsOutput> >   {
+
+
+
+
+    let endpoint = DeductCreditsEndpoint { 
+         apikey  , 
+        workspace_uuid , 
+        client_public_address  ,
+        credits_delta 
+      };
+
+     let response: Option< AuthResponse< UpdateApiCreditsOutput> >  
+        = perform_req_typed( &endpoint ).await.ok().flatten()  ;
+
+        response
+ 
 
 
 
