@@ -4,3 +4,4 @@ pub mod uint256;
 pub mod bytes ;
 
 pub mod datetime;
+pub mod decimal;

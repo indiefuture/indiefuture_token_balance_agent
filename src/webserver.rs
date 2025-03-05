@@ -80,10 +80,11 @@ async fn main()  -> io::Result<()> {
             .wrap(cors)
             .wrap(actix_web::middleware::Logger::default()) // Enable logger middleware
             
+            // Configure controller endpoints first
+              .configure(WebhookController::config)
+              
             // Serve static files from the /public directory
             .service(Files::new("/", "./public").index_file("index.html"))
-
-              .configure(WebhookController::config)
              
              
     })
