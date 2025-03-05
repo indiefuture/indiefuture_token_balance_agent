@@ -1,0 +1,21 @@
+##  Token Balance Agent 
+
+
+
+This is an example Agent which responds to HTTP request from humans OR other agents as long as they pay in 'credits' using a DefiRelay Refill API Key. 
+
+
+More information here :
+
+https://defirelay.com  
+
+
+
+
+
+### Accessing with the Indiefuture CLI 
+
+
+the indiefuture CLI tool can be used to easily pay credits  in order to query this agent . 
+
+https://github.com/indiefuture/indiefuture_cli
